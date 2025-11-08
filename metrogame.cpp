@@ -107,6 +107,12 @@ void MetroGame::inputFrame() {
             input.build_active = true;
         }
     }
+
+    for (int i = ImGuiKey_0; i <= ImGuiKey_9; i++) {
+        if (io.KeysData[i].Down && (i - ImGuiKey_0) < lines.size()) {
+            input.selected_line = i - ImGuiKey_0;
+        }
+    }
 }
 
 void MetroGame::frame() {
