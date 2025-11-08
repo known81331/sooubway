@@ -132,7 +132,7 @@ void MetroGame::drawLine(const MetroLine& line) {
         vec2 a = line.path_points[i-1];
         vec2 b = line.path_points[i];
 
-        draw_list->AddLine(ImVec2(a.x, a.y), ImVec2(b.x, b.y),, 8.0f);
+        draw_list->AddLine(ImVec2(a.x, a.y), ImVec2(b.x, b.y), IMHEXCOL(line.color), 8.0f);
     }
 }
 
@@ -149,9 +149,9 @@ void MetroGame::drawHUD() {
 
     for (int i = 0; i < lines.size(); i++) {
         if (i == input.selected_line)
-            draw_list->AddCircleFilled(ImVec2(100.f, 100.f), 50.f, IMHEXCOL(lines[i].color), 32);
+            draw_list->AddCircleFilled(ImVec2(40.f * (i+1), 40.f), 16.f, IMHEXCOL(lines[i].color), 32);
         else
-            draw_list->AddCircle(ImVec2(100.f, 100.f), 50.f, IMHEXCOL(lines[i].color), 32, 4.0f);
+            draw_list->AddCircle(ImVec2(40.f * (i+1), 40.f), 16.f, IMHEXCOL(lines[i].color), 32, 2.0f);
     }
 }
 
