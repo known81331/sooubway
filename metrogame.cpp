@@ -34,17 +34,22 @@ struct vec4 {
     float x, y, z, w;
 };
 
-struct MetroStation {
-    int x, y;
-
-    int shape;
+struct MetroCart {
+    int capacity, max_capacity;
+    float speed;
 };
 
+struct MetroStation {
+    std::string name;
+    int x, y;
+    int shape;
+};
 
 struct MetroLine {
     std::string name;
     uint64_t color;
     std::vector<vec2> path_points;
+    std::deque<MetroCart> carts;
 };
 
 
@@ -99,6 +104,8 @@ void MetroGame::drawStation(const MetroStation& station) {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
     draw_list->AddCircleFilled(ImVec2(station.x, station.y), 12.0f, IM_COL32(255, 255, 255, 255));
+
+    draw_list->AddText(ImVec2(station.x, station.y + 16.f), IM_COL32(0,0,0,255), station.name.data());
 }
 
 
@@ -122,6 +129,7 @@ void MetroDEBUG() {
         station.x = 200 + game.stations.size()*30;
         station.y = 200 + game.stations.size()*30;
         station.shape = 0;
+        station.name.resize(256);
         game.stations.push_back(station);
     }
 
@@ -140,6 +148,8 @@ void MetroDEBUG() {
 
     for (auto& station : game.stations) {
         if ( ImGui::CollapsingHeader( ("Station " + std::to_string((uint64_t)&station)).data() ) ) {
+            ImGui::InputText("name", station.name.data(), 256);
+
             ImGui::DragInt("x", &station.x);
             ImGui::DragInt("y", &station.y);
             ImGui::DragInt("shape", &station.shape);
