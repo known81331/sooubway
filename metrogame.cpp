@@ -76,6 +76,10 @@ void MetroGame::frame() {
         drawLine(line);
     }
 
+    for (auto& station : stations) {
+        drawStation(station);
+    }
+
     if (!paused)
         time += Util::dt();
 }
@@ -93,6 +97,8 @@ void MetroGame::drawLine(const MetroLine& line) {
 
 void MetroGame::drawStation(const MetroStation& station) {
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    draw_list->AddCircleFilled(ImVec2(station.x, station.y), 12.0f, IM_COL32(255, 255, 255, 255));
 }
 
 
@@ -111,6 +117,14 @@ void MetroDEBUG() {
         game.lines.push_back(line);
     }
 
+    if (ImGui::Button("Add Station")) {
+        MetroStation station;
+        station.x = 200 + game.stations.size()*30;
+        station.y = 200 + game.stations.size()*30;
+        station.shape = 0;
+        game.stations.push_back(station);
+    }
+
     for (auto& line : game.lines) {
         if ( ImGui::CollapsingHeader(line.name.data()) ) {
             int i = 0;
@@ -121,6 +135,14 @@ void MetroDEBUG() {
             if ( ImGui::Button("Add Point") ) {
                 line.path_points.push_back(vec2(400.f, 400.f));
             }
+        }
+    }
+
+    for (auto& station : game.stations) {
+        if ( ImGui::CollapsingHeader( ("Station " + std::to_string((uint64_t)&station)).data() ) ) {
+            ImGui::DragInt("x", &station.x);
+            ImGui::DragInt("y", &station.y);
+            ImGui::DragInt("shape", &station.shape);
         }
     }
 
