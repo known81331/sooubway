@@ -58,6 +58,7 @@ public:
     void create();
     void begin();
     void frame();
+    void inputFrame();
 
     void drawLine(const MetroLine& line);
     void drawStation(const MetroStation& station);
@@ -65,9 +66,19 @@ public:
     std::vector<MetroLine> lines;
     std::vector<MetroStation> stations;
 
+    std::string name;
+    unsigned texture_bg;
+
     float time;
 
     bool paused;
+
+    struct {
+        int selected_line;
+
+        bool build_active;
+    } input;
+
 };
 
 
@@ -75,8 +86,27 @@ void MetroGame::create() {
     
 }
 
+void MetroGame::inputFrame() {
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (io.MouseClicked[0]) {
+        ImGui::Text("Mouse Down");
+
+        if (input.build_active) {
+            if (input.selected_line < lines.size())
+                lines[input.selected_line].path_points.push_back( vec2(io.MousePos.x, io.MousePos.y) );
+            input.build_active = false;
+        }
+        else {
+            input.build_active = true;
+        }
+    }
+}
+
 void MetroGame::frame() {
     
+    MetroGame::inputFrame();
+
     for (auto& line : lines) {
         drawLine(line);
     }
