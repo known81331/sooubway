@@ -41,5 +41,9 @@ inline float dt() {
     return delta;
 }
 
+static inline float snapToGrid(float v, float grid = 48.0f) {
+    return std::round(v / grid) * grid;
+}
+
 
 }

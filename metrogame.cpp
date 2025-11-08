@@ -17,6 +17,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#define IMHEXCOL(x)  IM_COL32((x >> 24) & 0xFF,(x >> 16) & 0xFF, (x >> 8) & 0xFF, 0xFF)
 
 #include "util.hpp"
 
@@ -62,6 +63,7 @@ public:
 
     void drawLine(const MetroLine& line);
     void drawStation(const MetroStation& station);
+    void drawHUD();
 
     std::vector<MetroLine> lines;
     std::vector<MetroStation> stations;
@@ -92,9 +94,13 @@ void MetroGame::inputFrame() {
     if (io.MouseClicked[0]) {
         ImGui::Text("Mouse Down");
 
-        if (input.build_active) {
+        if (input.build_active || true) {
             if (input.selected_line < lines.size())
-                lines[input.selected_line].path_points.push_back( vec2(io.MousePos.x, io.MousePos.y) );
+            {
+                float sx = Util::snapToGrid(io.MousePos.x);
+                float sy = Util::snapToGrid(io.MousePos.y);
+                lines[input.selected_line].path_points.push_back( vec2(sx, sy) );
+            }
             input.build_active = false;
         }
         else {
@@ -126,7 +132,7 @@ void MetroGame::drawLine(const MetroLine& line) {
         vec2 a = line.path_points[i-1];
         vec2 b = line.path_points[i];
 
-        draw_list->AddLine(ImVec2(a.x, a.y), ImVec2(b.x, b.y), IM_COL32((line.color >> 24) & 0xFF,(line.color >> 16) & 0xFF, (line.color >> 8) & 0xFF, 0xFF), 8.0f);
+        draw_list->AddLine(ImVec2(a.x, a.y), ImVec2(b.x, b.y),, 8.0f);
     }
 }
 
@@ -138,6 +144,16 @@ void MetroGame::drawStation(const MetroStation& station) {
     draw_list->AddText(ImVec2(station.x, station.y + 16.f), IM_COL32(0,0,0,255), station.name.data());
 }
 
+void MetroGame::drawHUD() {
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    for (int i = 0; i < lines.size(); i++) {
+        if (i == input.selected_line)
+            draw_list->AddCircleFilled(ImVec2(100.f, 100.f), 50.f, IMHEXCOL(lines[i].color), 32);
+        else
+            draw_list->AddCircle(ImVec2(100.f, 100.f), 50.f, IMHEXCOL(lines[i].color), 32, 4.0f);
+    }
+}
 
 MetroGame game = {};
 
@@ -199,6 +215,7 @@ void BrowserController_render() {
     }
 
     game.frame();
+    game.drawHUD();
 
     MetroDEBUG();
 
